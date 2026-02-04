@@ -1,20 +1,150 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Manajemen Data Mahasiswa</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding page-bg">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-xs="12" size-md="6">
+        <ion-card class="form-card">
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="person-circle-outline" class="title-icon"></ion-icon>
+              {{ editingId ? 'Edit Mahasiswa' : 'Tambah Mahasiswa' }}
+            </ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <!-- FORM INPUT -->
+            <form [formGroup]="formMahasiswa" (ngSubmit)="simpanData()">
+
+              <ion-item>
+                <ion-label position="floating">Nama Lengkap</ion-label>
+                <ion-input #namaInput formControlName="nama"></ion-input>
+              </ion-item>
+              <ion-text color="danger" *ngIf="formMahasiswa.get('nama')?.touched && formMahasiswa.get('nama')?.invalid">
+                <small *ngIf="formMahasiswa.get('nama')?.errors?.['required']">Nama wajib diisi.</small>
+                <small *ngIf="formMahasiswa.get('nama')?.errors?.['minlength']">Minimal 3 karakter.</small>
+              </ion-text>
+
+              <ion-item>
+                <ion-label position="floating">NIM</ion-label>
+                <ion-input formControlName="nim"></ion-input>
+              </ion-item>
+              <ion-text color="danger" *ngIf="formMahasiswa.get('nim')?.touched && formMahasiswa.get('nim')?.invalid">
+                <small *ngIf="formMahasiswa.get('nim')?.errors?.['required']">NIM wajib diisi.</small>
+                <small *ngIf="formMahasiswa.get('nim')?.errors?.['pattern']">NIM harus berupa angka.</small>
+              </ion-text>
+
+              <ion-item>
+                <ion-label position="floating">Jurusan</ion-label>
+                <ion-select formControlName="jurusan">
+                  <ion-select-option value="TI">Teknik Informatika</ion-select-option>
+                  <ion-select-option value="SI">Sistem Informasi</ion-select-option>
+                  <ion-select-option value="DKV">Desain Komunikasi Visual</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-text color="danger" *ngIf="formMahasiswa.get('jurusan')?.touched && formMahasiswa.get('jurusan')?.invalid">
+                <small>Jurusan wajib dipilih.</small>
+              </ion-text>
+
+              <ion-item>
+                <ion-label position="floating">Email</ion-label>
+                <ion-input type="email" formControlName="email"></ion-input>
+              </ion-item>
+              <ion-text color="danger" *ngIf="formMahasiswa.get('email')?.touched && formMahasiswa.get('email')?.invalid">
+                <small *ngIf="formMahasiswa.get('email')?.errors?.['required']">Email wajib diisi.</small>
+                <small *ngIf="formMahasiswa.get('email')?.errors?.['email']">Format email tidak valid.</small>
+              </ion-text>
+
+              <ion-item>
+                <ion-label position="floating">Alamat</ion-label>
+                <ion-textarea formControlName="alamat"></ion-textarea>
+              </ion-item>
+              <ion-text color="danger" *ngIf="formMahasiswa.get('alamat')?.touched && formMahasiswa.get('alamat')?.invalid">
+                <small *ngIf="formMahasiswa.get('alamat')?.errors?.['required']">Alamat wajib diisi.</small>
+                <small *ngIf="formMahasiswa.get('alamat')?.errors?.['minlength']">Alamat minimal 10 karakter.</small>
+              </ion-text>
+
+              <ion-button expand="block" type="submit" [disabled]="formMahasiswa.invalid" class="save-btn ion-margin-top">
+                <ion-icon slot="start" name="save-outline"></ion-icon>
+                {{ editingId ? 'Perbarui Data' : 'Simpan Data' }}
+              </ion-button>
+
+              <ion-button *ngIf="editingId" expand="block" type="button" fill="clear" color="medium" (click)="cancelEdit()">
+                Batal
+              </ion-button>
+
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size-xs="12" size-md="6">
+        <div class="list-header">
+          <h2>📋 Data Mahasiswa Tersimpan <ion-badge color="primary">{{ filteredData.length }}</ion-badge></h2>
+          <p class="muted">Kelola data mahasiswa Anda dengan mudah — ketuk Hapus untuk menghapus.</p>
+        </div>
+
+        <div class="searchbar-wrapper">
+          <ion-searchbar
+            placeholder="Cari nama, NIM, jurusan, atau email"
+            [(ngModel)]="filterText"
+            inputmode="search"
+            showCancelButton="focus">
+          </ion-searchbar>
+        </div>
+
+        <div *ngIf="dataMahasiswa.length === 0" class="empty-state">
+          <ion-icon name="folder-open-outline" class="empty-icon"></ion-icon>
+          <p>Tidak ada data tersimpan. Tambahkan data mahasiswa menggunakan form di samping.</p>
+        </div>
+
+        <div *ngIf="dataMahasiswa.length > 0 && filteredData.length === 0" class="empty-state">
+          <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+          <p>Tidak ada hasil untuk "{{ filterText }}".</p>
+        </div>
+
+        <ion-card *ngFor="let mhs of filteredData" class="mhs-card">
+          <ion-card-header class="card-top">
+            <div class="card-title-left">
+              <ion-icon name="person-outline" class="avatar-icon"></ion-icon>
+              <ion-card-title>{{ mhs.nama }} <span class="nim">({{ mhs.nim }})</span></ion-card-title>
+            </div>
+            <div class="card-actions">
+              <ion-button color="primary" size="small" fill="clear" (click)="showDetail(mhs)">
+                <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+                Detail
+              </ion-button>
+              <ion-button color="tertiary" size="small" fill="clear" (click)="editData(mhs)">
+                <ion-icon slot="start" name="create-outline"></ion-icon>
+                Edit
+              </ion-button>
+              <ion-button color="danger" size="small" fill="outline" (click)="hapusData(mhs.id)">
+                <ion-icon slot="start" name="trash-outline"></ion-icon>
+                Hapus
+              </ion-button>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p><b>Jurusan:</b> <span class="chip">{{ mhs.jurusan }}</span></p>
+            <p><b>Email:</b> {{ mhs.email }}</p>
+            <p><b>Alamat:</b> {{ mhs.alamat }}</p>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="focusName()" title="Fokus Tambah">
+      <ion-icon name="pencil-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>

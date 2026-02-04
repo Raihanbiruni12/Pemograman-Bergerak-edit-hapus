@@ -1,3 +1,8 @@
+.page-bg {
+  background: linear-gradient(135deg, #f6f9ff 0%, #f3f7fb 50%, #eef6ff 100%);
+  min-height: 100%;
+}
+
 #container {
   text-align: center;
 
@@ -6,6 +11,90 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.form-card, .mhs-card {
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(30, 64, 175, 0.08);
+  overflow: hidden;
+}
+
+.form-card ion-card-header, .mhs-card ion-card-header {
+  background: linear-gradient(90deg, rgba(61,90,241,0.08), rgba(34,197,94,0.04));
+  padding: 18px 16px;
+}
+
+.title-icon {
+  font-size: 36px;
+  vertical-align: middle;
+  margin-right: 8px;
+  color: #3d5af1;
+}
+
+.list-header h2 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+}
+
+.list-header .muted {
+  color: #6b7280;
+  margin: 0 0 16px 0;
+}
+
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+  padding: 18px 10px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: #c7d2fe;
+  margin-bottom: 8px;
+}
+
+.mhs-card {
+  margin-bottom: 12px;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-icon {
+  font-size: 28px;
+  background: linear-gradient(135deg,#7c3aed,#06b6d4);
+  color: #fff;
+  padding: 6px;
+  border-radius: 999px;
+}
+
+.card-actions ion-button {
+  --padding-start: 10px;
+  --padding-end: 10px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(59,130,246,0.08);
+  color: #1e3a8a;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.save-btn {
+  --background: linear-gradient(90deg,#4f46e5,#06b6d4);
+  color: #fff;
+  border: none;
 }
 
 #container strong {
@@ -24,4 +113,8 @@
 
 #container a {
   text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .form-card, .mhs-card { margin-bottom: 16px; }
 }
